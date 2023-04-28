@@ -36,8 +36,18 @@ def run_texte(ta: table) -> int:
             except ValueError:
                 continue
         elif cmd == "set vsign":
+            try:
+                x = int(input("x ? : "))
+                y = int(input("y ? : "))
+                v = int(input("True pour >, False pour <  : "))
+                ta.set_v_sign_at(x, y, v)
             pass
         elif cmd == "set hsign":
+            try:
+                x = int(input("x ? : "))
+                y = int(input("y ? : "))
+                v = int(input("True pour >, False pour <  : "))
+                ta.set_h_sign_at(x, y, v)
             pass
         else:
             print("commande inconnue")
