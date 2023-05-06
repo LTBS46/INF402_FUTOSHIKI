@@ -7,6 +7,17 @@ from table import table
 from sys import stdout, stdin
 from _io import TextIOWrapper
 
+def demander_un_nombre(msg: str = "") -> int | None:
+    while True:
+        try:
+            rv = int(input(msg + " ? : "))
+            return rv
+        except ValueError:  # si c'est autre chose qu'un entier,
+            print("Ce paramètre n'accepte que les valeurs entières. Veuillez réessayer.")
+            continue        # on redemande la valeur
+        except KeyBoardInterrupt:
+            return None
+
 def run_texte(ta: table) -> int:
     """
     fonction principale en mode textuel
@@ -15,7 +26,7 @@ def run_texte(ta: table) -> int:
     if ta is None:
         while True:
             try:
-                c = int(input("taille?"))
+                c = demander_un_nombre("taille")
                 ta = table('{"size": %d}' % c)
             except:
                 continue
@@ -26,29 +37,36 @@ def run_texte(ta: table) -> int:
     if __debug__:
             assert(ta is not None)
     while True:
-        cmd = " ".join(filter(None, input("? : ").split()))
+        cmd = " ".join(filter(None, input("? : ").split())) # enlève tous les espaces en trop
         if cmd == "set value":
             try:
-                x = int(input("x ? : "))
-                y = int(input("y ? : "))
-                v = int(input("v (0 pour retirer) ? : "))
+                x = demander_un_nombre("x")
+                y = demander_un_nombre("y")
+                v = demander_un_nombre("v (0 pour retirer)")
                 ta.set_value_at(x, y, v)
             except ValueError:
                 continue
         elif cmd == "set vsign":
             try:
-                x = int(input("x ? : "))
-                y = int(input("y ? : "))
-                v = int(input("True pour >, False pour <  : "))
+                x = demander_un_nombre("x")
+                y = demander_un_nombre("y")
+                v = int(input("orientation (True pour ⋀, False pour ⋁) : ")) # ordre/affichage des caractères spéciaux à vérifier
                 ta.set_v_sign_at(x, y, v)
-            pass
+            except ValueError:
+                continue
         elif cmd == "set hsign":
             try:
-                x = int(input("x ? : "))
-                y = int(input("y ? : "))
-                v = int(input("True pour >, False pour <  : "))
+                x = demander_un_nombre("x")
+                y = demander_un_nombre("y")
+                v = int(input("orientation (True pour >, False pour <) : "))
                 ta.set_h_sign_at(x, y, v)
-            pass
+            except ValueError:
+                continue
+        elif cmd == "display table": # afficher la table
+            # il suffirait de convertir la table en chaîne de caractères
+            pass # j'ai besoin de sommeil :(
+        elif cmd == "quit": # mettre fin aux modifications
+            break           # sortir de la boucle while True
         else:
             print("commande inconnue")
         """
