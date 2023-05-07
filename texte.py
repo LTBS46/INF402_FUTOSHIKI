@@ -10,7 +10,7 @@ from _io import TextIOWrapper
 def demander_un_nombre(msg: str = "") -> int | None:
     while True:
         try:
-            rv = int(input(msg + " ? : "))
+            rv = int(input(msg + " : "))
             return rv
         except ValueError:  # si c'est autre chose qu'un entier,
             print("Ce paramètre n'accepte que les valeurs entières. Veuillez réessayer.")
@@ -37,9 +37,10 @@ def run_texte(ta: table) -> int:
     if __debug__:
             assert(ta is not None)
     while True:
-        cmd = " ".join(filter(None, input("? : ").split())) # enlève tous les espaces en trop
+        cmd = " ".join(filter(None, input("cmd -> ").split())) # enlève tous les espaces en trop
         if cmd == "set value":
             try:
+                print("Entrez les coordonnées de la case à modifier")
                 x = demander_un_nombre("x")
                 y = demander_un_nombre("y")
                 v = demander_un_nombre("v (0 pour retirer)")
@@ -48,14 +49,16 @@ def run_texte(ta: table) -> int:
                 continue
         elif cmd == "set vsign":
             try:
+                print("Quelle est la case se situant EN HAUT du signe à ajouter ?")
                 x = demander_un_nombre("x")
                 y = demander_un_nombre("y")
-                v = int(input("orientation (True pour ⋀, False pour ⋁) : ")) # ordre/affichage des caractères spéciaux à vérifier
+                v = int(input("orientation (True pour ⋁, False pour ⋀) : ")) # affichage des caractères spéciaux à vérifier
                 ta.set_v_sign_at(x, y, v)
             except ValueError:
                 continue
         elif cmd == "set hsign":
             try:
+                print("Quelle est la case se situant À GAUCHE du signe à ajouter ?")
                 x = demander_un_nombre("x")
                 y = demander_un_nombre("y")
                 v = int(input("orientation (True pour >, False pour <) : "))
@@ -64,7 +67,8 @@ def run_texte(ta: table) -> int:
                 continue
         elif cmd == "display table": # afficher la table
             # il suffirait de convertir la table en chaîne de caractères
-            pass # j'ai besoin de sommeil :(
+            try:
+               print(string(ta)) 
         elif cmd == "quit": # mettre fin aux modifications
             break           # sortir de la boucle while True
         else:

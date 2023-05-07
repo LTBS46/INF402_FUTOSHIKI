@@ -22,7 +22,7 @@ class table(object):
     constructeur de la table
     prend comme argument
     - soit un entier: et construit une table vide
-    - soit une chaine de caractère: et le decompose en objet json
+    - soit une chaine de caractères : et le decompose en objet json
 
     """
     def __init__(self: Self, i: int | str = 5) -> None:
@@ -41,7 +41,7 @@ class table(object):
             _v = loads(i)
             self.__init__(_v["size"])
             # TODO
-        else: # innatteignable
+        else: # inatteignable
             raise TypeError()
         return None
 
@@ -152,9 +152,9 @@ class table(object):
                 f"-{self.gen_id(x, y + 1, v)} 0"
                 for y in range(self.n) if y != self.values[x].index(v + 1)
             ] if v + 1 in self.values[x] else [
-                # la valeur doit etre dans la colone une fois
+                # la valeur doit etre dans la colonne au moins une fois
                 " ".join(str(self.gen_id(x, y, v + 1)) for y in range(self.n) if not self.values[x][y]) + " 0",
-                # la valeur ne doit pas etre presente plusieur fois
+                # la valeur ne doit pas être présente plusieurs fois
                 *[
                     f"-{self.gen_id(x, y, v + 1)} {self.gen_id(x, y2, v + 1)} 0"
                     for y in range(self.n) for y2 in range(y + 1, self.n)
@@ -172,9 +172,9 @@ class table(object):
     
         """
         return sum([
-            # si superieur
+            # si supérieur
             (
-                # valeur seulement du cote inferieur
+                # valeur seulement du côte inférieur
                 [" ".join([
                     self.gen_id(x, y, v + 1) for v in range(self.values[x][y + 1], self.n)
                 ]) + " 0", "-" + " -".join([
@@ -183,7 +183,7 @@ class table(object):
                 if self.values[x][y + 1] else
                 # aucune valeur autour du signe
                 []
-            ) if self.h_sign[x][y] else (            # si inferieur
+            ) if self.h_sign[x][y] else (            # si inférieur
                 []
                 if self.values[x][y + 1] else
                 # aucune valeur autour du signe
