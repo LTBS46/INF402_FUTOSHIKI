@@ -68,7 +68,9 @@ def run_texte(ta: table) -> int:
         elif cmd == "display table": # afficher la table
             # il suffirait de convertir la table en chaîne de caractères
             try:
-               print(string(ta)) 
+                print(string(ta))
+            except:
+                print("L'opération n'a pas fonctionnée")
         elif cmd == "quit": # mettre fin aux modifications
             break           # sortir de la boucle while True
         else:
