@@ -7,15 +7,21 @@ from table import table
 from sys import stdout, stdin
 from _io import TextIOWrapper
 
-def demander_un_nombre(msg: str = "") -> int | None:
+def demander_un_nombre(msg: str = "", val_max: int = 0) -> int | None:
     while True:
         try:
             rv = int(input(msg + " : "))
-            return rv
+            if rv < 0 or rv > val_max:
+                print("L'entier entré ici doit être compris entre 0 et " + str(val_max)
+                      + ". Veuillez réessayer.")
+                continue          
+            else:
+                return rv
         except ValueError:  # si c'est autre chose qu'un entier,
             print("Ce paramètre n'accepte que les valeurs entières. Veuillez réessayer.")
             continue        # on redemande la valeur
         except KeyboardInterrupt:
+            print("\tValeur non remplie. Redémarrage.")
             return None
 
 def run_texte(ta: table) -> int:
@@ -26,7 +32,7 @@ def run_texte(ta: table) -> int:
     if ta is None:
         while True:
             try:
-                c = demander_un_nombre("taille")
+                c = int(input("Taille de la grille : "))
                 ta = table('{"size": %d}' % c)
             except:
                 continue
@@ -41,27 +47,41 @@ def run_texte(ta: table) -> int:
         if cmd == "set value": # rentrer une valeur dans une case
             try:
                 print("Entrez les coordonnées de la case à modifier")
-                x = demander_un_nombre("x")
-                y = demander_un_nombre("y")
-                v = demander_un_nombre("v (0 pour retirer)")
+                x = demander_un_nombre("x", c-1)
+                if x is None:   # si on a détecté un KeyboardInterrupt,
+                    continue    # on quitte la commande
+                y = demander_un_nombre("y", c-1)
+                if y is None:    
+                    continue
+                v = demander_un_nombre("valeur (0 pour retirer)", c)
+                if v is None:
+                    continue                
                 ta.set_value_at(x, y, v)
             except ValueError:
                 continue
         elif cmd == "set vsign": # mettre un signe |vertical|
             try:
-                print("Quelle est la case se situant EN HAUT du signe à ajouter ?")
-                x = demander_un_nombre("x")
-                y = demander_un_nombre("y")
-                v = int(input("orientation (0 pour ⋀, 1 pour ⋁) : "))
+                print("Quelle est la case se situant AU DESSUS du signe à ajouter ?")
+                x = demander_un_nombre("x", c-1)
+                if x is None:
+                    continue                
+                y = demander_un_nombre("y", c-2)
+                if y is None:
+                    continue                
+                v = demander_un_nombre("orientation (0 pour ⋀, 1 pour ⋁)", 1)
                 ta.set_v_sign_at(x, y, v)
             except ValueError:
                 continue
         elif cmd == "set hsign": # mettre un signe -horizontal-
             try:
                 print("Quelle est la case se situant À GAUCHE du signe à ajouter ?")
-                x = demander_un_nombre("x")
-                y = demander_un_nombre("y")
-                v = int(input("orientation (0 pour <, 1 pour >) : "))
+                x = demander_un_nombre("x", c-2)
+                if x is None:
+                    continue                
+                y = demander_un_nombre("y", c-1)
+                if y is None:
+                    continue                
+                v = demander_un_nombre("orientation (0 pour <, 1 pour >) : ", 1)
                 ta.set_h_sign_at(x, y, v)
             except ValueError:
                 continue
@@ -70,7 +90,7 @@ def run_texte(ta: table) -> int:
                 print("\n")
                 print(ta)
             except:
-                print("L'opération n'a pas fonctionnée")
+                print("L'opération n'a pas fonctionné")
         elif cmd == "quit": # mettre fin aux modifications
             break           # sortir de la boucle while True
         else:
