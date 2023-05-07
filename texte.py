@@ -15,7 +15,7 @@ def demander_un_nombre(msg: str = "") -> int | None:
         except ValueError:  # si c'est autre chose qu'un entier,
             print("Ce paramètre n'accepte que les valeurs entières. Veuillez réessayer.")
             continue        # on redemande la valeur
-        except KeyBoardInterrupt:
+        except KeyboardInterrupt:
             return None
 
 def run_texte(ta: table) -> int:
