@@ -83,6 +83,48 @@ class table(object):
         """
     
         """
+
+        n = self.n
+        side = n * 2 + 1
+        sideh = self._s * "-"
+        spaces = self._s * " "
+        s = sideh[:-1]
+        vv = "v" + s
+        vup = "^" + s
+        line_sep = (["|",sideh]*int(n)) + ["|\n"]
+        line_content = (["|",spaces]*int(n)) + ["|\n"]
+
+        rv = (line_sep + line_content) * n + line_sep
+
+        for i in range(n):
+            for j in range(n):
+                v = self.values[i][j]
+                if v:
+                    try:
+                        rv[1 + side + i * 2 + j * side * 2] = self._pad_f(str(v))
+                    except Exception as e:
+                        print("c", e)
+                        raise e
+                if i < (n - 1):
+                    v = self.h_sign[i][j]
+                    if v is not None:
+                        try:
+                            rv[2*i + 2*side*j+2+side] = ">" if v else "<"
+                        except Exception as e:
+                            print("h", e)
+                            raise e
+
+                if j < (n - 1):
+                    v = self.v_sign[i][j]
+                    if v is not None:
+                        try:
+                            rv[2*i + 2*side*j+1+side*2] = vv if v else vup
+                        except Exception as e:
+                            print("v", e)
+                            raise e
+
+        return "".join(rv)
+
         rv : list[str] = list((("-" * self._s).join(["|" for i in range(self.n + 1)]) + "\n").join(
             map(lambda _x: _x + "\n", ["", *[
                 "|".join(["", *[

@@ -89,8 +89,10 @@ def run_texte(ta: table) -> int:
             try:
                 print("\n")
                 print(ta)
-            except:
+            except Exception as e:
+                print(e)
                 print("L'opération n'a pas fonctionné")
+                raise e
         elif cmd == "quit": # mettre fin aux modifications
             break           # sortir de la boucle while True
         else:
