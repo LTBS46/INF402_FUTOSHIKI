@@ -34,6 +34,7 @@ def run_texte(ta: table) -> int:
             try:
                 c = int(input("Taille de la grille : "))
                 ta = table('{"size": %d}' % c)
+                break
             except:
                 continue
     else:
