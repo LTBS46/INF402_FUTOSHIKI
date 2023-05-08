@@ -59,7 +59,6 @@ class table(object):
             self.__init__(_v["size"])
             e = _v["hsign"]
             for k, v in e.items():
-                print(k, v)
                 x, y = (int(tmp) for tmp in k.split(":"))
                 self.h_sign[x][y] = v
             e = _v["value"]
