@@ -36,8 +36,6 @@ def run_texte(ta: table) -> int:
                 ta = table('{"size": %d}' % c)
             except:
                 continue
-            else:
-                break
     else:
         c = len(ta)
     if __debug__:
