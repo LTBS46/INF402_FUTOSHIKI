@@ -6,6 +6,7 @@ from table import table
 
 from sys import stdout, stdin
 from _io import TextIOWrapper
+from sat import solve
 
 def demander_un_nombre(msg: str = "", val_max: int = 0) -> int | None:
     while True:
@@ -108,7 +109,12 @@ def run_texte(ta: table) -> int:
 #    ta.set_v_sign_at(3, 2, True) => y_lim=c-2
 #    print(ta)
     print("Modifications terminées.")
-    print("Aperçu du fichier Dimacs :")
+    print("\n")    
+    print("Tentative de résolution :")
     print("\n")
-    print(ta.gen_dimacs())
+
+    dimacs = ta.gen_dimacs()
+    res = solve(dimacs)
+    ta_resolu = table(ta.n, res)
+    print(ta_resolu)
     return 0
