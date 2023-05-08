@@ -35,7 +35,7 @@ def minisat(dimacs : str) -> str:
 
     """
     fd_in, path_in = mkstemp(text=True)
-    f_in = fdopen(fd_in)
+    f_in = fdopen(fd_in, mode="w")
     f_in.write(dimacs)
     f_in.close()
     fd_out, path_out = mkstemp(text=True)

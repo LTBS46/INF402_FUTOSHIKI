@@ -3,6 +3,7 @@
 from graphique import run_graphique     # contient le mode graphique
 from texte import run_texte             # contient le mode texte
 from table import table
+from sat import solve
 
 # librarie standard, cf : internet
 
@@ -20,13 +21,14 @@ if __name__ == '__main__':
     
     
     parser.add_argument('infile', nargs='?', type=argparse.FileType('r'), default=sys.stdin)
-    # parser.add_argument('outfile', nargs='?', type=argparse.FileType('w'), default=sys.stdout)
+    parser.add_argument('outfile', nargs='?', type=argparse.FileType('w'), default=sys.stdout)
 
     args = parser.parse_args()
-    print(args.infile, args.flag_graph)
 
     if args.flag_graph is None:
-        pass
+        t = table(args.infile.read())
+        #print(t)
+        args.outfile.write(str(table(t.n, solve(t.gen_dimacs()))))
     else:
         if args.flag_graph:
             run_graphique(infile=args.infile)

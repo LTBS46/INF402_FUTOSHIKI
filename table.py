@@ -14,6 +14,7 @@ else:
     from typing import Self # nouveau en 3.11
 
 from json import loads
+from json.decoder import JSONDecodeError
 from math import log10, floor
 
 
@@ -23,9 +24,9 @@ class table(object):
     prend comme argument
     - soit un entier: et construit une table vide
     - soit une chaine de caractères : et le decompose en objet json
-
+    - soit un entier: et une chaine de caractère
     """
-    def __init__(self: Self, i: int | str = 5) -> None:
+    def __init__(self: Self, i: int | str = 5, ret: str | None = None) -> None:
         """"""
         _t = type(i)
         if _t == int:
@@ -35,12 +36,39 @@ class table(object):
                 self.h_sign = [[None for m in range(i)] for l in range(i - 1)]
                 self.v_sign = [[None for m in range(i - 1)] for l in range(i)]
                 self._s : int = floor(log10(self.n)) + 1
+                if ret is not None:
+                    l = ret.split()
+                    if l[0] == "SAT":
+                        nl = l[1:-1]
+                        for v in nl:
+                            vi = int(v) - 1
+                            if vi >= 0:
+                                val = vi % self.n
+                                vi //= self.n
+                                x_ = vi % self.n
+                                y_ = vi // self.n
+                                self.values[x_][y_] = val + 1 
+                    elif l[0] == "UNSAT":
+                        print("failure to solve")
+                    else:
+                        raise ValueError()
             else:
                 raise ValueError()
         elif _t == str:
             _v = loads(i)
             self.__init__(_v["size"])
-            # TODO
+            e = _v["hsign"]
+            for k, v in e.items():
+                x, y = (int(tmp) for tmp in k.split(":"))
+                self.h_sign[x][y] = v
+            e = _v["value"]
+            for k,v in e.items():
+                x, y = (int(tmp) for tmp in k.split(":"))
+                self.values[x][y] = v
+            e = _v["vsign"]
+            for k, v in e.items():
+                x, y = (int(tmp) for tmp in k.split(":"))
+                self.v_sign[x][y] = v
         else: # inatteignable
             raise TypeError()
         return None
@@ -111,7 +139,7 @@ class table(object):
         """
         if v is None:
             v = 0
-        elif not -self.n < v < self.n:
+        elif not (0 <= v and v <= self.n):
             raise ValueError()
         self.values[x][y] = v        
 
@@ -145,65 +173,101 @@ class table(object):
         """
     
         """
-        if x is None:
-            return sum([self.gen_v_clauses(_x) for _x in range(self.n)], [])
-        else:
-            return sum([[   # la valeur est deja dans la colone
-                f"-{self.gen_id(x, y + 1, v)} 0"
-                for y in range(self.n) if y != self.values[x].index(v + 1)
-            ] if v + 1 in self.values[x] else [
-                # la valeur doit etre dans la colonne au moins une fois
-                " ".join(str(self.gen_id(x, y, v + 1)) for y in range(self.n) if not self.values[x][y]) + " 0",
-                # la valeur ne doit pas être présente plusieurs fois
-                *[
-                    f"-{self.gen_id(x, y, v + 1)} {self.gen_id(x, y2, v + 1)} 0"
-                    for y in range(self.n) for y2 in range(y + 1, self.n)
-                ]
-            ] for v in range(self.n)], [])
+        return sum([sum([
+            ([" ".join([("" if v + 1 == self.values[x][y] else "-") + f"{self.gen_id(x, y, v + 1)}" for y in range(self.n)]) + " 0"]) if
+            (v + 1) in [self.values[x][y] for y in range(self.n)]
+            else ([" ".join(str(self.gen_id(x, y, v + 1)) for y in range(self.n)) + " 0"] + sum([
+                [f"-{self.gen_id(x,y,v+1)} -{self.gen_id(x,y2, v+1)} 0" for y2 in range(y + 1, self.n)] for y in range(self.n - 1)
+            ], []))
+        for v in range(self.n)], []) for x in range(self.n)], [])
 
     def gen_h_clauses(self: Self) -> list[str]:
         """
     
         """
-        return []
+        return sum([sum([
+            ([" ".join([("" if v + 1 == self.values[x][y] else "-") + f"{self.gen_id(x, y, v + 1)}" for x in range(self.n)]) + " 0"]) if
+            (v + 1) in [self.values[x][y] for x in range(self.n)]
+            else ([" ".join(str(self.gen_id(x, y, v + 1)) for x in range(self.n)) + " 0"] + sum([
+                [f"-{self.gen_id(x, y, v + 1)} -{self.gen_id(x2, y, v + 1)} 0" for x2 in range(x + 1, self.n)] for x in range(self.n - 1)
+            ], []))
+         for v in range(self.n)],[]) for y in range(self.n)], [])
 
     def gen_h_sign_clauses(self: Self) -> list[str]:
         """
     
         """
-        return sum([
-            # si supérieur
-            (
-                # valeur seulement du côte inférieur
-                [" ".join([
-                    self.gen_id(x, y, v + 1) for v in range(self.values[x][y + 1], self.n)
-                ]) + " 0", "-" + " -".join([
-                    self.gen_id(x, y, v + 1) for v in range(self.values[x][y + 1])
-                ]) + " 0"]
-                if self.values[x][y + 1] else
-                # aucune valeur autour du signe
-                []
-            ) if self.h_sign[x][y] else (            # si inférieur
-                []
-                if self.values[x][y + 1] else
-                # aucune valeur autour du signe
-                []
-            )
-            for x in range(self.n - 2) for y in range(self.n) if self.h_sign[x][y] is not None and not self.values[x][y]
-        ], []) + sum([
-            ([] if self.values[self.n - 1][y] else (
-
-            )) if self.values[self.n - 2][y] else ((
-
-            ) if self.values[self.n - 1][y] else (
-
-            ))
-            for y in range(self.n) if self.h_sign[self.n - 2][y] is not None
-        ], [])
+        rv = []
+        for x in range(self.n - 1):
+            for y in range(self.n):
+                if self.h_sign[x][y] is None:
+                    continue
+                else:
+                    if self.values[x][y] != 0:
+                        if self.values[x+1][y] != 0: # nested condition either trivialy valid or trivialy invalid
+                            if self.h_sign[x][y]:
+                                for v1 in range(self.n):
+                                    for v2 in range(v1, self.n):
+                                        rv.append(f"-{self.gen_id(x, y, v1 + 1)} -{self.gen_id(x, y + 1, v2 + 1)} 0")
+                            else:
+                                for v1 in range(self.n):
+                                    for v2 in range(v1, self.n):
+                                        rv.append(f"-{self.gen_id(x, y, v2 + 1)} -{self.gen_id(x, y + 1, v1 + 1)} 0")
+                        elif self.h_sign[x][y]: # superieur
+                            rv.append(" ".join([str(self.gen_id(x + 1, y, v+1)) for v in range(self.values[x][y])]) + " 0")
+                        else:
+                            rv.append(" ".join([str(self.gen_id(x + 1, y, v+1)) for v in range(self.values[x][y] , self.n)]) + " 0")
+                    elif self.values[x+1][y] != 0:
+                        if self.h_sign[x][y]:
+                            rv.append(" ".join([str(self.gen_id(x, y, v+1)) for v in range(self.values[x+1][y] , self.n)]) + " 0")
+                        else:
+                            rv.append(" ".join([str(self.gen_id(x,y,v+1)) for v in range(self.values[x+1][y])]) + " ")
+                    elif self.h_sign[x][y]:
+                        for v1 in range(self.n):
+                            for v2 in range(v1, self.n):
+                                rv.append(f"-{self.gen_id(x, y, v1 + 1)} -{self.gen_id(x, y + 1, v2 + 1)} 0")
+                    else:
+                        for v1 in range(self.n):
+                            for v2 in range(v1, self.n):
+                                rv.append(f"-{self.gen_id(x, y, v2 + 1)} -{self.gen_id(x, y + 1, v1 + 1)} 0")
+        return rv
         
     def gen_v_sign_clauses(self: Self) -> list[str]:
         """"""
-        return []
+        rv = []
+        for x in range(self.n):
+            for y in range(self.n - 1):
+                if self.v_sign[x][y] is None:
+                     continue
+                else:
+                    if self.values[x][y] != 0:
+                        if self.values[x][y+1] != 0:
+                            if self.h_sign[x][y]:
+                                for v1 in range(self.n):
+                                    for v2 in range(v1, self.n):
+                                        rv.append(f"-{self.gen_id(x, y, v1 + 1)} -{self.gen_id(x+ 1, y , v2 + 1)} 0")
+                            else:
+                                for v1 in range(self.n):
+                                    for v2 in range(v1, self.n):
+                                        rv.append(f"-{self.gen_id(x, y, v2 + 1)} -{self.gen_id(x + 1, y, v1 + 1)} 0")
+                        elif self.v_sign[x][y]:
+                            rv.append(" ".join([f"{self.gen_id(x, y + 1, v + 1)}" for v in range(self.values[x][y])]) + " 0")
+                        else:
+                            rv.append(" ".join([str(self.gen_id(x , y+1, v+1)) for v in range(self.values[x][y] , self.n)]) + " 0")
+                    elif self.values[x][y+1] != 0:
+                        if self.v_sign[x][y]:
+                            rv.append(" ".join([str(self.gen_id(x, y, v+1)) for v in range(self.values[x][y+1] , self.n)]) + " 0")
+                        else:
+                            rv.append(" ".join([str(self.gen_id(x,y,v+1)) for v in range(self.values[x][y+1])]) + " ")
+                    elif self.v_sign[x][y]:
+                        for v1 in range(self.n):
+                            for v2 in range(v1, self.n):
+                                rv.append(f"-{self.gen_id(x, y, v1 + 1)} -{self.gen_id(x + 1, y, v2 + 1)} 0")
+                    else:
+                        for v1 in range(self.n):
+                            for v2 in range(v1, self.n):
+                                rv.append(f"-{self.gen_id(x, y, v2 + 1)} -{self.gen_id(x+1, y, v1 + 1)} 0")
+        return rv
 
     def gen_clauses(self: Self) -> list[str]:
         """"""
