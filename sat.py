@@ -55,6 +55,8 @@ def minisat(dimacs : str) -> str:
             rv = f.read(None)
         remove(path_out)
         return rv
+    if code == 20:
+        return "UNSAT"
     else:
         remove(path_out)
         print(code)
