@@ -147,12 +147,14 @@ class table(object):
         """
     
         """
+        if x < 0 or y < 0 or y >= n or x > (n-2)
         self.v_sign[x][y] = v
 
     def set_h_sign_at(self: Self, x: int, y: int, v: bool | None) -> None:
         """
     
         """
+        if x < 0 or y < 0 or y >= n or x > (n-2)
         self.h_sign[x][y] = v
 
     def gen_c_clauses(self: Self) -> list[str]:
