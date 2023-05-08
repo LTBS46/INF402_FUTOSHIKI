@@ -137,6 +137,7 @@ class table(object):
         """
     
         """
+        n = self.n
         if v is None:
             v = 0
         elif not (0 <= v and v <= self.n):
@@ -147,6 +148,7 @@ class table(object):
         """
     
         """
+        n = self.n
         if x < 0 or y < 0 or y >= n or x > (n-2):
             raise ValueError()
         self.v_sign[x][y] = v
@@ -155,6 +157,7 @@ class table(object):
         """
     
         """
+        n = self.n
         if x < 0 or y < 0 or y >= n or x > (n-2):
             raise ValueError()
         self.h_sign[x][y] = v
