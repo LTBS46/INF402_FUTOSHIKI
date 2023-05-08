@@ -125,31 +125,6 @@ class table(object):
 
         return "".join(rv)
 
-        rv : list[str] = list((("-" * self._s).join(["|" for i in range(self.n + 1)]) + "\n").join(
-            map(lambda _x: _x + "\n", ["", *[
-                "|".join(["", *[
-                    self._pad_f(str(self.values[x][y]) if self.values[x][y] != 0 else "")
-                    for y in range(self.n)
-                ], ""]) for x in range(self.n)
-            ], ""])
-        )[1:])
-        h_base_off = 3 + self.n + self._s * self.n + self._s
-        h_x_off = 1 + self._s
-        h_y_off = 2 * (self.n + self._s * self.n + self._s)
-        v_base_off = 2 * (2 + self._s * self.n + self.n) + 1
-        v_x_off = 1 + self._s
-        v_y_off = 2 * (2 + self._s * self.n + self.n)
-        for x in range(self.n):
-            for y in range(self.n):
-                if y + 1 < self.n:
-                    if self.v_sign[x][y] is not None:
-                        rv[v_base_off + v_x_off * x + v_y_off * y
-                        ] = "v" if self.v_sign[x][y] else "^"
-                if x + 1 < self.n:
-                    if self.h_sign[x][y] is not None:
-                        rv[h_base_off + h_x_off * x + h_y_off * y
-                        ] = ">" if self.h_sign[x][y] else "<"
-        return "".join(rv)
 
     def __len__(self: Self) -> int:
         """"""
