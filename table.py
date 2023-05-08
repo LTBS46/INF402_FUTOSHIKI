@@ -59,6 +59,7 @@ class table(object):
             self.__init__(_v["size"])
             e = _v["hsign"]
             for k, v in e.items():
+                print(k, v)
                 x, y = (int(tmp) for tmp in k.split(":"))
                 self.h_sign[x][y] = v
             e = _v["value"]
@@ -231,11 +232,11 @@ class table(object):
                         if self.values[x+1][y] != 0: # nested condition either trivialy valid or trivialy invalid
                             if self.h_sign[x][y]:
                                 for v1 in range(self.n):
-                                    for v2 in range(v1, self.n):
+                                    for v2 in range(v1+1, self.n):
                                         rv.append(f"-{self.gen_id(x, y, v1 + 1)} -{self.gen_id(x, y + 1, v2 + 1)} 0")
                             else:
                                 for v1 in range(self.n):
-                                    for v2 in range(v1, self.n):
+                                    for v2 in range(v1+1, self.n):
                                         rv.append(f"-{self.gen_id(x, y, v2 + 1)} -{self.gen_id(x, y + 1, v1 + 1)} 0")
                         elif self.h_sign[x][y]: # superieur
                             rv.append(" ".join([str(self.gen_id(x + 1, y, v+1)) for v in range(self.values[x][y])]) + " 0")
@@ -248,11 +249,11 @@ class table(object):
                             rv.append(" ".join([str(self.gen_id(x,y,v+1)) for v in range(self.values[x+1][y])]) + " ")
                     elif self.h_sign[x][y]:
                         for v1 in range(self.n):
-                            for v2 in range(v1, self.n):
+                            for v2 in range(v1+1, self.n):
                                 rv.append(f"-{self.gen_id(x, y, v1 + 1)} -{self.gen_id(x, y + 1, v2 + 1)} 0")
                     else:
                         for v1 in range(self.n):
-                            for v2 in range(v1, self.n):
+                            for v2 in range(v1+1, self.n):
                                 rv.append(f"-{self.gen_id(x, y, v2 + 1)} -{self.gen_id(x, y + 1, v1 + 1)} 0")
         return rv
         
@@ -268,11 +269,11 @@ class table(object):
                         if self.values[x][y+1] != 0:
                             if self.h_sign[x][y]:
                                 for v1 in range(self.n):
-                                    for v2 in range(v1, self.n):
+                                    for v2 in range(v1+1, self.n):
                                         rv.append(f"-{self.gen_id(x, y, v1 + 1)} -{self.gen_id(x+ 1, y , v2 + 1)} 0")
                             else:
                                 for v1 in range(self.n):
-                                    for v2 in range(v1, self.n):
+                                    for v2 in range(v1+1, self.n):
                                         rv.append(f"-{self.gen_id(x, y, v2 + 1)} -{self.gen_id(x + 1, y, v1 + 1)} 0")
                         elif self.v_sign[x][y]:
                             rv.append(" ".join([f"{self.gen_id(x, y + 1, v + 1)}" for v in range(self.values[x][y])]) + " 0")
@@ -285,11 +286,11 @@ class table(object):
                             rv.append(" ".join([str(self.gen_id(x,y,v+1)) for v in range(self.values[x][y+1])]) + " ")
                     elif self.v_sign[x][y]:
                         for v1 in range(self.n):
-                            for v2 in range(v1, self.n):
+                            for v2 in range(v1+1, self.n):
                                 rv.append(f"-{self.gen_id(x, y, v1 + 1)} -{self.gen_id(x + 1, y, v2 + 1)} 0")
                     else:
                         for v1 in range(self.n):
-                            for v2 in range(v1, self.n):
+                            for v2 in range(v1+1, self.n):
                                 rv.append(f"-{self.gen_id(x, y, v2 + 1)} -{self.gen_id(x+1, y, v1 + 1)} 0")
         return rv
 

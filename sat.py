@@ -57,6 +57,7 @@ def minisat(dimacs : str) -> str:
         return rv
     else:
         remove(path_out)
+        print(code)
         raise ValueError()
 
 __all__ = ["solve", "solver"]
