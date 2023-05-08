@@ -26,7 +26,7 @@ class table(object):
     - soit une chaine de caractères : et le decompose en objet json
     - soit un entier: et une chaine de caractère
     """
-    def __init__(self: Self, i: int | str = 5, ret: str | None = None) -> None:
+    def __init__(self: Self, i: int | str = 5, ret: str | None = None):
         """"""
         _t = type(i)
         if _t == int:

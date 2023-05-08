@@ -32,11 +32,12 @@ def run_texte(ta: table) -> int:
     if ta is None:
         while True:
             try:
-                c = int(input("Taille de la grille : "))
-                ta = table('{"size": %d}' % c)
+                c = demander_un_nombre("Taille de la grille", 2<<16)
+                ta = table(c)
+            except Exception as e:
+                print(e)
+            if ta is not None:
                 break
-            except:
-                continue
     else:
         c = len(ta)
     if __debug__:
